@@ -1,0 +1,297 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+class Employee
+{
+public:
+    string name;
+    int id;
+    int age;
+    double salary;
+
+    // Default constructor
+    Employee() : id(0), age(0), salary(0.0) {}
+
+    // Parameterized constructor
+    Employee(string n, int i, int a, double s) : name(n), id(i), age(a), salary(s) {}
+
+    // member function
+    void display() const
+    {
+        cout << "\tID: " << id << "\tName: " << name << "\tAge: " << age << "\t\tSalary: $" << salary << endl;
+    }
+};
+
+class User
+{
+public:
+    string username;
+    string password;
+
+    User() {}
+
+    User(string u, string p) : username(u), password(p) {}
+};
+
+class EmployeeManagementSystem
+{
+private:
+    vector<Employee> employees;
+    vector<User> users;
+    User currentUser;
+
+
+public:
+    // Default constructor
+    EmployeeManagementSystem() {}
+
+    // Create a new user account
+    void createAccount()
+    {
+        string username, password;
+
+        cout << "\n\tEnter a new username: ";
+        cin >> username;
+
+        cout << "\tEnter a new password: ";
+        cin >> password;
+
+        User newUser(username, password);
+        users.push_back(newUser);
+
+        cout << "\n\tAccount created successfully!\n";
+    }
+
+    // Log in to the system
+    void login()
+    {
+        string username, password;
+
+        cout << "\n\tEnter your username: ";
+        cin >> username;
+
+        cout << "\tEnter your password: ";
+        cin >> password;
+
+        for (const auto& user : users)
+        {
+            if (user.username == username && user.password == password)
+            {
+                currentUser = user;
+                cout << "\n\tLogin successful!\n";
+                return;
+            }
+        }
+
+        cout << "\n\tInvalid username or password. Please try again.\n";
+    }
+
+    // Add a new employee to the system
+    void addEmployee()
+    {
+        if (currentUser.username.empty())
+        {
+            cout << "\n\tYou need to log in first.\n";
+            return;
+        }
+
+        string name;
+        int id, age;
+        double salary;
+
+        cout << "\n\tEnter employee name: ";
+        cin >> name;
+
+        // Ensure ID is unique
+        do
+        {
+            cout << "\tEnter employee ID: ";
+            cin >> id;
+
+            if (isIdUsed(id))
+            {
+                cout << "\tID is already in use. Please enter a different ID.\n";
+            }
+        } while (isIdUsed(id));
+
+        do
+        {
+            cout << "\tEnter employee age: ";
+            cin >> age;
+
+            if (age < 18)
+            {
+                cout << "\tAge must be at least 18. Please enter a valid age.\n";
+            }
+        } while (age < 18);
+
+        cout << "\tEnter employee salary: $";
+        cin >> salary;
+
+        Employee newEmployee(name, id, age, salary);
+        employees.push_back(newEmployee);
+
+        cout << "\n\tEmployee added successfully!\n";
+    }
+
+    // Check if an ID is already in use
+    bool isIdUsed(int id) const
+    {
+        for (const auto& employee : employees)
+        {
+            if (employee.id == id)
+            {
+                return true; // ID is already in use
+            }
+        }
+        return false; // ID is not in use
+    }
+
+    void displayAllEmployees() const
+    {
+        cout << "\n\tEmployee Details:\n";
+        for (const auto& employee : employees)
+        {
+            employee.display();
+        }
+        cout << endl;
+    }
+
+    // Display a selected employee by name and ID
+    void displaySelectedEmployee()
+    {
+        if (employees.empty())
+        {
+            cout << "\n\tNo employees in the system.\n";
+            return;
+        }
+
+        string name;
+        int id;
+
+        cout << "\n\tEnter employee name: ";
+        cin >> name;
+
+        cout << "\tEnter employee ID: ";
+        cin >> id;
+
+        for (const auto& employee : employees)
+        {
+            if (employee.name == name && employee.id == id)
+            {
+                cout << "\n\tSelected Employee Details:\n";
+                employee.display();
+                return;
+            }
+        }
+
+        cout << "\n\tNo matching employee found.\n";
+    }
+
+    // Save employee information to a text file
+    void saveToFile() const
+    {
+        ofstream outFile("employee_data.txt");
+        if (!outFile)
+        {
+            cerr << "\n\tThere is no data for Save File\n";
+            return;
+        }
+
+        for (const auto& employee : employees)
+        {
+            outFile << employee.id << " " << employee.name << " " << employee.age << " " << employee.salary << endl;
+        }
+
+        cout << "\n\tEmployee data saved to file.\n";
+    }
+
+    // Load employee information from a text file
+    void loadFromFile()
+    {
+        ifstream inFile("employee_data.txt");
+        if (!inFile)
+        {
+            cout << "\n\tNo previous data found.\n";
+            return;
+        }
+
+        employees.clear(); // Clear existing data
+
+        while (!inFile.eof())
+        {
+            Employee employee;
+            inFile >> employee.id >> employee.name >> employee.age >> employee.salary;
+            if (!inFile.fail())
+            {
+                employees.push_back(employee);
+            }
+        }
+
+        cout << "\n\tEmployee data loaded from file.\n";
+    }
+};
+
+int main()
+{
+    EmployeeManagementSystem ems;
+
+    int choice;
+
+    do
+    {
+        system("cls");  // Clear the entire console screen
+
+        cout << "\n\t\t\t\t\t\tEmployee Management System\n\n";
+        cout << "\tMenu----->\n";
+        cout << "\t1. Create Account\n";
+        cout << "\t2. Log In\n";
+        cout << "\t3. Add Employee\n";
+        cout << "\t4. Display All Employees\n";
+        cout << "\t5. Display Selected Employee\n";
+        cout << "\t6. Save to File\n";
+        cout << "\t7. Load from File\n";
+        cout << "\t8. Exit\n";
+        cout << "\tEnter your choice: ";
+        cin >> choice;
+
+        system("cls");  // Clear the entire console screen
+
+        switch (choice)
+        {
+        case 1:
+            ems.createAccount();
+            break;
+        case 2:
+            ems.login();
+            break;
+        case 3:
+            ems.addEmployee();
+            break;
+        case 4:
+            ems.displayAllEmployees();
+            break;
+        case 5:
+            ems.displaySelectedEmployee();
+            break;
+        case 6:
+            ems.saveToFile();
+            break;
+        case 7:
+            ems.loadFromFile();
+            break;
+        case 8:
+            cout << "\n\tExiting program.\n";
+            break;
+        default:
+            cout << "\n\tInvalid choice. Please enter a number between 1 and 8.\n";
+        }
+
+        cout << "\n\tPress Enter to continue...";
+        cin.ignore();
+        cin.get();
+
+    } while (choice != 8);
+
+    return 0;
+}
